@@ -216,8 +216,26 @@ button { color: inherit; font: inherit; }
 div.heading-side p { margin: 0 0 16px; }
 .heading-side a { color: var(--blue); font-size: 15px; }
 .heading-side a:hover { text-decoration: underline; }
-.heading-side .button-primary { color: var(--white); font-size: 14px; }
-.heading-side .button-primary:hover { color: var(--white); text-decoration: none; }
+.heading-side a.button.button-primary.portfolio-cta {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--blue);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 520;
+  text-decoration: none;
+}
+.heading-side a.button.button-primary.portfolio-cta:link,
+.heading-side a.button.button-primary.portfolio-cta:visited { color: #fff; }
+.heading-side a.button.button-primary.portfolio-cta:hover { background: var(--blue-hover); color: #fff; text-decoration: none; transform: translateY(-1px); }
+.heading-side a.button.button-primary.portfolio-cta > span { color: #fff; }
+.portfolio-cta-arrow { font-size: 20px; font-weight: 350; line-height: 1; transition: transform 160ms ease; }
+.portfolio-cta:hover .portfolio-cta-arrow { transform: translateX(2px); }
 
 .project { margin: 0 0 clamp(100px, 12vw, 170px); }
 .project-media {

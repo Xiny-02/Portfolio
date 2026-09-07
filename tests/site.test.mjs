@@ -39,7 +39,11 @@ test('image and document delivery is optimized for slow networks', () => {
   assert.match(html, /查看个人简历/);
   assert.doesNotMatch(html, /download="董鑫-视觉设计简历\.pdf"/);
   assert.doesNotMatch(html, /约 \d+(?:\.\d+)? \w+B|轻量作品集/);
-  assert.match(html, /class="button button-primary"[^>]*>打开完整作品集<\/a>/);
+  assert.match(html, /class="button button-primary portfolio-cta"[^>]*aria-label="在新页面查看完整作品集"/);
+  assert.match(html, /class="button button-primary portfolio-cta"[^>]*href="docs\/Dong-Xin-Portfolio-Web\.pdf"[^>]*target="_blank"/);
+  assert.match(html, /<span>打开完整作品集<\/span>/);
+  assert.match(css, /a\.button\.button-primary\.portfolio-cta:[^}]*color: #fff/s);
+  assert.match(css, /a\.button\.button-primary\.portfolio-cta > span \{ color: #fff; \}/);
   assert.doesNotMatch(html, /打开 63 页完整作品集/);
   assert.match(script, /hydrateImage/);
   assert.match(script, /IntersectionObserver/);
@@ -81,4 +85,9 @@ test('responsive and reduced-motion safeguards are present', () => {
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(html, /class="skip-link"/);
   assert.match(html, /aria-label="上一张作品"/);
+});
+
+test('public page does not expose a GitHub navigation control', () => {
+  assert.doesNotMatch(html, /href="https:\/\/github\.com\//);
+  assert.doesNotMatch(html, />GitHub<\/a>/);
 });
