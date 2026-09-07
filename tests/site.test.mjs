@@ -36,7 +36,9 @@ test('image and document delivery is optimized for slow networks', () => {
   assert.match(html, /srcset="assets\/work\/mobile\//);
   assert.match(html, /loading="lazy"/);
   assert.match(html, /Dong-Xin-Resume-Web\.pdf/);
-  assert.match(html, /download="董鑫-视觉设计简历\.pdf"/);
+  assert.match(html, /查看个人简历/);
+  assert.doesNotMatch(html, /download="董鑫-视觉设计简历\.pdf"/);
+  assert.doesNotMatch(html, /约 \d+(?:\.\d+)? \w+B|轻量作品集/);
   assert.match(script, /hydrateImage/);
   assert.match(script, /IntersectionObserver/);
   assert.match(script, /assets\/gallery\/mobile/);
