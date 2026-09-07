@@ -2,6 +2,19 @@ const header = document.querySelector('[data-header]');
 const menuToggle = document.querySelector('[data-menu-toggle]');
 const nav = document.querySelector('[data-nav]');
 
+const hydrateImage = (image) => {
+  if (!image || image.dataset.hydrated === 'true') return;
+  if (image.dataset.srcset) image.srcset = image.dataset.srcset;
+  if (image.dataset.src) image.src = image.dataset.src;
+  image.dataset.hydrated = 'true';
+};
+
+const hydrateSlide = (slides, index) => {
+  if (!slides.length) return;
+  const safeIndex = (index + slides.length) % slides.length;
+  hydrateImage(slides[safeIndex]?.querySelector('img'));
+};
+
 const setHeaderState = () => {
   header?.classList.toggle('is-scrolled', window.scrollY > 24);
 };
@@ -34,9 +47,11 @@ let heroTimer;
 
 const showHeroSlide = (nextIndex) => {
   heroIndex = (nextIndex + heroSlides.length) % heroSlides.length;
+  hydrateSlide(heroSlides, heroIndex);
   heroSlides.forEach((slide, index) => slide.classList.toggle('is-active', index === heroIndex));
   if (slideCount) slideCount.textContent = `${String(heroIndex + 1).padStart(2, '0')} / ${String(heroSlides.length).padStart(2, '0')}`;
   if (stageProgress) stageProgress.style.width = `${((heroIndex + 1) / heroSlides.length) * 100}%`;
+  window.setTimeout(() => hydrateSlide(heroSlides, heroIndex + 1), 600);
 };
 
 const restartHeroTimer = () => {
@@ -54,6 +69,12 @@ document.querySelector('[data-slide-next]')?.addEventListener('click', () => {
   showHeroSlide(heroIndex + 1);
   restartHeroTimer();
 });
+const queueHeroPreload = () => {
+  const preload = () => hydrateSlide(heroSlides, 1);
+  if ('requestIdleCallback' in window) window.requestIdleCallback(preload, { timeout: 2500 });
+  else window.setTimeout(preload, 1800);
+};
+window.addEventListener('load', queueHeroPreload, { once: true });
 restartHeroTimer();
 
 const lifeCarousel = document.querySelector('[data-life-carousel]');
@@ -65,6 +86,7 @@ let lifeTouchStart = null;
 
 const showLifeSlide = (nextIndex) => {
   lifeIndex = (nextIndex + lifeSlides.length) % lifeSlides.length;
+  hydrateSlide(lifeSlides, lifeIndex);
   lifeSlides.forEach((slide, index) => {
     const active = index === lifeIndex;
     slide.classList.toggle('is-active', active);
@@ -76,6 +98,7 @@ const showLifeSlide = (nextIndex) => {
     if (active) dot.setAttribute('aria-current', 'true');
     else dot.removeAttribute('aria-current');
   });
+  window.setTimeout(() => hydrateSlide(lifeSlides, lifeIndex + 1), 500);
 };
 
 const stopLifeTimer = () => window.clearInterval(lifeTimer);
@@ -124,7 +147,21 @@ lifeCarousel?.addEventListener('touchend', (event) => {
   lifeTouchStart = null;
   startLifeTimer();
 }, { passive: true });
-startLifeTimer();
+if (lifeCarousel && 'IntersectionObserver' in window) {
+  const lifeObserver = new IntersectionObserver((entries) => {
+    const visible = entries.some((entry) => entry.isIntersecting);
+    if (visible) {
+      hydrateSlide(lifeSlides, lifeIndex);
+      window.setTimeout(() => hydrateSlide(lifeSlides, lifeIndex + 1), 500);
+      startLifeTimer();
+    } else {
+      stopLifeTimer();
+    }
+  }, { rootMargin: '300px 0px' });
+  lifeObserver.observe(lifeCarousel);
+} else {
+  startLifeTimer();
+}
 
 const createPages = (folder, start, end, captions = {}) =>
   Array.from({ length: end - start + 1 }, (_, offset) => {
@@ -192,6 +229,24 @@ const galleryCaption = document.querySelector('[data-gallery-caption]');
 const galleryCounter = document.querySelector('[data-gallery-counter]');
 let activeGallery = null;
 let galleryIndex = 0;
+let galleryImageObserver;
+
+const observeGalleryImages = () => {
+  galleryImageObserver?.disconnect();
+  const images = [...galleryPages.querySelectorAll('img[data-src]')];
+  if (!('IntersectionObserver' in window)) {
+    images.forEach(hydrateImage);
+    return;
+  }
+  galleryImageObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      hydrateImage(entry.target);
+      galleryImageObserver.unobserve(entry.target);
+    });
+  }, { root: galleryScroll, rootMargin: '60% 0px' });
+  images.forEach((image) => galleryImageObserver.observe(image));
+};
 
 const renderGallery = () => {
   if (!activeGallery) return;
@@ -207,9 +262,12 @@ const renderGallery = () => {
 
       figure.className = 'gallery-page';
       figure.dataset.galleryPage = String(index);
-      image.src = src;
+      image.dataset.src = src;
+      image.dataset.srcset = `assets/gallery/mobile/${src.split('/').slice(-2).join('/')} 800w, ${src} 1600w`;
+      image.sizes = '(max-width: 700px) calc(100vw - 20px), 1180px';
       image.alt = caption;
-      image.loading = 'eager';
+      image.loading = 'lazy';
+      image.decoding = 'async';
       image.width = 1600;
       image.height = 900;
       pageNumber.textContent = `${String(index + 1).padStart(2, '0')} / ${String(activeGallery.images.length).padStart(2, '0')}`;
@@ -221,12 +279,16 @@ const renderGallery = () => {
   );
   galleryCounter.textContent = `${String(galleryIndex + 1).padStart(2, '0')} / ${String(activeGallery.images.length).padStart(2, '0')}`;
   galleryCaption.textContent = activeGallery.images[galleryIndex][1];
+  hydrateImage(galleryPages.querySelector('[data-gallery-page="0"] img'));
+  hydrateImage(galleryPages.querySelector('[data-gallery-page="1"] img'));
 };
 
 const showGalleryPage = (nextIndex, behavior = 'smooth') => {
   if (!activeGallery) return;
   galleryIndex = (nextIndex + activeGallery.images.length) % activeGallery.images.length;
   const page = galleryPages.querySelector(`[data-gallery-page="${galleryIndex}"]`);
+  hydrateImage(page?.querySelector('img'));
+  hydrateImage(galleryPages.querySelector(`[data-gallery-page="${galleryIndex + 1}"] img`));
   galleryCounter.textContent = `${String(galleryIndex + 1).padStart(2, '0')} / ${String(activeGallery.images.length).padStart(2, '0')}`;
   galleryCaption.textContent = activeGallery.images[galleryIndex][1];
   page.scrollIntoView({ behavior, block: 'start' });
@@ -242,10 +304,12 @@ const openGallery = (galleryName) => {
   requestAnimationFrame(() => {
     galleryScroll.scrollTop = 0;
     galleryScroll.focus({ preventScroll: true });
+    observeGalleryImages();
   });
 };
 
 const closeGallery = () => {
+  galleryImageObserver?.disconnect();
   dialog?.close();
   document.body.classList.remove('is-dialog-open');
 };

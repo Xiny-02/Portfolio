@@ -20,7 +20,7 @@ test('page contains the job-seeking narrative and primary sections', () => {
 });
 
 test('all local src and href assets exist and project-site paths stay relative', () => {
-  const urls = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map((match) => match[1]);
+  const urls = [...html.matchAll(/(?:src|href|data-src)="([^"]+)"/g)].map((match) => match[1]);
   const localUrls = urls.filter((url) => !/^(?:https?:|mailto:|tel:|#)/.test(url));
 
   assert.ok(localUrls.length > 10);
@@ -28,6 +28,20 @@ test('all local src and href assets exist and project-site paths stay relative',
     assert.equal(url.startsWith('/'), false, `${url} must be relative for GitHub project pages`);
     assert.equal(existsSync(new URL(`../${url}`, import.meta.url)), true, `${url} should exist`);
   }
+});
+
+test('image and document delivery is optimized for slow networks', () => {
+  assert.match(html, /rel="preload"[^>]+iqiyi-channels\.webp/);
+  assert.match(html, /imagesrcset="assets\/work\/mobile\/iqiyi-channels\.webp/);
+  assert.match(html, /srcset="assets\/work\/mobile\//);
+  assert.match(html, /loading="lazy"/);
+  assert.match(html, /Dong-Xin-Resume-Web\.pdf/);
+  assert.match(html, /download="董鑫-视觉设计简历\.pdf"/);
+  assert.match(script, /hydrateImage/);
+  assert.match(script, /IntersectionObserver/);
+  assert.match(script, /assets\/gallery\/mobile/);
+  assert.ok(readFileSync(new URL('../docs/Dong-Xin-Resume-Web.pdf', import.meta.url)).byteLength < 700_000);
+  assert.ok(readFileSync(new URL('../docs/Dong-Xin-Portfolio-Web.pdf', import.meta.url)).byteLength < 6_000_000);
 });
 
 test('portfolio galleries reference existing images', () => {
