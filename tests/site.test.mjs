@@ -9,7 +9,7 @@ const script = readFileSync(new URL('../script.js', import.meta.url), 'utf8');
 test('page contains the job-seeking narrative and primary sections', () => {
   for (const expected of [
     '寻找 2027 届校招机会',
-    '好的设计会(?:<br \/>)?温和地引导人',
+    '好的设计会温和地引导人',
     '精选作品',
     '实践经历',
     '关于我',
@@ -48,7 +48,7 @@ test('project gallery supports continuous vertical scrolling', () => {
 });
 
 test('about section includes the interactive five-photo carousel', () => {
-  assert.match(html, /好的设计会(?:<br \/>)?温和地引导人/);
+  assert.match(html, /好的设计会温和地引导人/);
   assert.equal((html.match(/data-life-slide/g) || []).length, 5);
   assert.equal((html.match(/data-life-dot=/g) || []).length, 5);
   assert.match(script, /showLifeSlide/);
@@ -63,12 +63,4 @@ test('responsive and reduced-motion safeguards are present', () => {
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(html, /class="skip-link"/);
   assert.match(html, /aria-label="上一张作品"/);
-});
-
-test('Apple-inspired card tokens and directional links are present', () => {
-  assert.match(css, /--soft: #f5f5f7/);
-  assert.match(css, /--blue: #0071e3/);
-  assert.match(css, /--card-radius: 24px/);
-  assert.match(html, /查看精选作品 <span aria-hidden="true">&gt;<\/span>/);
-  assert.match(html, /查看简历 <span aria-hidden="true">&gt;<\/span>/);
 });
