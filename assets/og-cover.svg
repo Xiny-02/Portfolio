@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f5f5f2"/>
+  <rect x="64" y="64" width="86" height="86" fill="#202126"/>
+  <text x="107" y="119" text-anchor="middle" font-family="Arial,sans-serif" font-weight="800" font-size="30" fill="white">DX</text>
+  <text x="64" y="285" font-family="PingFang SC,Noto Sans SC,sans-serif" font-weight="750" font-size="86" letter-spacing="-5" fill="#202126">董鑫｜视觉设计作品集</text>
+  <text x="68" y="372" font-family="PingFang SC,Noto Sans SC,sans-serif" font-size="34" fill="#55565b">品牌视觉 · 内容运营 · 多端体验</text>
+  <rect x="64" y="494" width="1072" height="2" fill="#202126"/>
+  <text x="64" y="551" font-family="Arial,sans-serif" font-weight="700" font-size="24" fill="#164ee8">2027 GRADUATE OPPORTUNITY</text>
+  <circle cx="1060" cy="125" r="45" fill="#f1cf55"/>
+</svg>
