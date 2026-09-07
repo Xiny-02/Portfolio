@@ -56,6 +56,76 @@ document.querySelector('[data-slide-next]')?.addEventListener('click', () => {
 });
 restartHeroTimer();
 
+const lifeCarousel = document.querySelector('[data-life-carousel]');
+const lifeSlides = [...document.querySelectorAll('[data-life-slide]')];
+const lifeDots = [...document.querySelectorAll('[data-life-dot]')];
+let lifeIndex = 0;
+let lifeTimer;
+let lifeTouchStart = null;
+
+const showLifeSlide = (nextIndex) => {
+  lifeIndex = (nextIndex + lifeSlides.length) % lifeSlides.length;
+  lifeSlides.forEach((slide, index) => {
+    const active = index === lifeIndex;
+    slide.classList.toggle('is-active', active);
+    slide.setAttribute('aria-hidden', String(!active));
+  });
+  lifeDots.forEach((dot, index) => {
+    const active = index === lifeIndex;
+    dot.classList.toggle('is-active', active);
+    if (active) dot.setAttribute('aria-current', 'true');
+    else dot.removeAttribute('aria-current');
+  });
+};
+
+const stopLifeTimer = () => window.clearInterval(lifeTimer);
+const startLifeTimer = () => {
+  stopLifeTimer();
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    lifeTimer = window.setInterval(() => showLifeSlide(lifeIndex + 1), 5000);
+  }
+};
+
+document.querySelector('[data-life-prev]')?.addEventListener('click', () => {
+  showLifeSlide(lifeIndex - 1);
+  startLifeTimer();
+});
+document.querySelector('[data-life-next]')?.addEventListener('click', () => {
+  showLifeSlide(lifeIndex + 1);
+  startLifeTimer();
+});
+lifeDots.forEach((dot) => dot.addEventListener('click', () => {
+  showLifeSlide(Number(dot.dataset.lifeDot));
+  startLifeTimer();
+}));
+lifeCarousel?.addEventListener('mouseenter', stopLifeTimer);
+lifeCarousel?.addEventListener('mouseleave', startLifeTimer);
+lifeCarousel?.addEventListener('focusin', stopLifeTimer);
+lifeCarousel?.addEventListener('focusout', startLifeTimer);
+lifeCarousel?.addEventListener('pointermove', (event) => {
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  const rect = lifeCarousel.getBoundingClientRect();
+  const x = (event.clientX - rect.left) / rect.width - .5;
+  const y = (event.clientY - rect.top) / rect.height - .5;
+  lifeCarousel.style.setProperty('--life-rx', `${-y * 2.5}deg`);
+  lifeCarousel.style.setProperty('--life-ry', `${x * 3}deg`);
+});
+lifeCarousel?.addEventListener('pointerleave', () => {
+  lifeCarousel.style.setProperty('--life-rx', '0deg');
+  lifeCarousel.style.setProperty('--life-ry', '0deg');
+});
+lifeCarousel?.addEventListener('touchstart', (event) => {
+  lifeTouchStart = event.touches[0]?.clientX ?? null;
+}, { passive: true });
+lifeCarousel?.addEventListener('touchend', (event) => {
+  if (lifeTouchStart == null) return;
+  const distance = (event.changedTouches[0]?.clientX ?? lifeTouchStart) - lifeTouchStart;
+  if (Math.abs(distance) > 45) showLifeSlide(lifeIndex + (distance < 0 ? 1 : -1));
+  lifeTouchStart = null;
+  startLifeTimer();
+}, { passive: true });
+startLifeTimer();
+
 const createPages = (folder, start, end, captions = {}) =>
   Array.from({ length: end - start + 1 }, (_, offset) => {
     const page = start + offset;

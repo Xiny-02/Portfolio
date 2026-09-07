@@ -56,7 +56,7 @@
       <section class="hero section-shell" id="top" aria-labelledby="hero-title">
         <div class="hero-copy">
           <p class="hero-status"><span>视觉设计 · 品牌与内容体验</span><span>北京</span></p>
-          <h1 id="hero-title">让复杂内容，<br />清晰，也有温度。</h1>
+          <h1 id="hero-title">好的设计会温和地引导人</h1>
           <p class="hero-intro">
             你好，我是董鑫。北京印刷学院视觉传达设计硕士在读，拥有爱奇艺少儿业务多端设计经验。
             我把审美判断、信息组织和业务目标放在同一个画面里。
@@ -269,12 +269,35 @@
       </section>
 
       <section class="about section-shell" id="about" aria-labelledby="about-title">
-        <div class="portrait-block">
-          <div class="portrait-frame">
-            <img src="assets/profile-dong-xin.webp" alt="董鑫个人照片" />
+        <figure class="portrait-block">
+          <div class="life-carousel" data-life-carousel aria-roledescription="轮播" aria-label="董鑫的生活照片">
+            <div class="life-slide is-active" data-life-slide aria-hidden="false">
+              <img src="assets/life/life-1.webp" alt="董鑫在窗边的生活照片" />
+            </div>
+            <div class="life-slide" data-life-slide aria-hidden="true">
+              <img src="assets/life/life-2.webp" alt="董鑫在城市中的生活照片" />
+            </div>
+            <div class="life-slide" data-life-slide aria-hidden="true">
+              <img src="assets/life/life-3.webp" alt="董鑫参观展览的生活照片" />
+            </div>
+            <div class="life-slide life-slide-landscape" data-life-slide aria-hidden="true">
+              <img src="assets/life/life-4.webp" alt="董鑫在公园中的生活照片" />
+            </div>
+            <div class="life-slide" data-life-slide aria-hidden="true">
+              <img src="assets/life/life-5.webp" alt="董鑫在城市建筑前的生活照片" />
+            </div>
+            <button class="life-arrow life-arrow-prev" type="button" aria-label="上一张生活照" data-life-prev>‹</button>
+            <button class="life-arrow life-arrow-next" type="button" aria-label="下一张生活照" data-life-next>›</button>
+            <div class="life-dots" aria-label="选择生活照">
+              <button class="is-active" type="button" aria-label="查看第 1 张生活照" aria-current="true" data-life-dot="0"></button>
+              <button type="button" aria-label="查看第 2 张生活照" data-life-dot="1"></button>
+              <button type="button" aria-label="查看第 3 张生活照" data-life-dot="2"></button>
+              <button type="button" aria-label="查看第 4 张生活照" data-life-dot="3"></button>
+              <button type="button" aria-label="查看第 5 张生活照" data-life-dot="4"></button>
+            </div>
           </div>
-          <p>董鑫 · 视觉传达设计硕士在读</p>
-        </div>
+          <figcaption>生活、观察与持续好奇</figcaption>
+        </figure>
         <div class="about-copy">
           <p class="section-kicker">关于我</p>
           <h2 id="about-title">设计是审美判断，<br />也是理解人与内容。</h2>

@@ -9,7 +9,7 @@ const script = readFileSync(new URL('../script.js', import.meta.url), 'utf8');
 test('page contains the job-seeking narrative and primary sections', () => {
   for (const expected of [
     '寻找 2027 届校招机会',
-    '让复杂内容',
+    '好的设计会温和地引导人',
     '精选作品',
     '实践经历',
     '关于我',
@@ -45,6 +45,17 @@ test('project gallery supports continuous vertical scrolling', () => {
   assert.match(css, /\.gallery-scroll \{[^}]*overflow-y: auto/s);
   assert.match(script, /createPages\('muchun', 4, 25/);
   assert.match(script, /galleryScroll\?\.addEventListener\('scroll'/);
+});
+
+test('about section includes the interactive five-photo carousel', () => {
+  assert.match(html, /好的设计会温和地引导人/);
+  assert.equal((html.match(/data-life-slide/g) || []).length, 5);
+  assert.equal((html.match(/data-life-dot=/g) || []).length, 5);
+  assert.match(script, /showLifeSlide/);
+  assert.match(script, /touchstart/);
+  for (let index = 1; index <= 5; index += 1) {
+    assert.equal(existsSync(new URL(`../assets/life/life-${index}.webp`, import.meta.url)), true);
+  }
 });
 
 test('responsive and reduced-motion safeguards are present', () => {
