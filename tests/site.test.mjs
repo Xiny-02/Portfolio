@@ -48,7 +48,7 @@ test('project gallery supports continuous vertical scrolling', () => {
 });
 
 test('responsive and reduced-motion safeguards are present', () => {
-  assert.match(css, /@media \(max-width: 560px\)/);
+  assert.match(css, /@media \(max-width: 520px\)/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(html, /class="skip-link"/);
   assert.match(html, /aria-label="上一张作品"/);
