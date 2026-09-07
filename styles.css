@@ -216,20 +216,8 @@ button { color: inherit; font: inherit; }
 div.heading-side p { margin: 0 0 16px; }
 .heading-side a { color: var(--blue); font-size: 15px; }
 .heading-side a:hover { text-decoration: underline; }
-.heading-side .portfolio-button {
-  display: inline-flex;
-  min-height: 44px;
-  align-items: center;
-  justify-content: center;
-  padding: 0 21px;
-  border-radius: 999px;
-  background: var(--blue);
-  color: var(--white);
-  font-size: 14px;
-  font-weight: 540;
-  transition: background 160ms ease, transform 160ms ease;
-}
-.heading-side .portfolio-button:hover { background: var(--blue-hover); text-decoration: none; transform: translateY(-1px); }
+.heading-side .button-primary { color: var(--white); font-size: 14px; }
+.heading-side .button-primary:hover { color: var(--white); text-decoration: none; }
 
 .project { margin: 0 0 clamp(100px, 12vw, 170px); }
 .project-media {
