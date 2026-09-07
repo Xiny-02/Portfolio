@@ -335,11 +335,12 @@
           <div>
             <span data-gallery-type>项目图集</span>
             <h2 data-gallery-title>项目名称</h2>
+            <p class="gallery-hint">向下滑动浏览完整项目</p>
           </div>
           <button type="button" aria-label="关闭图集" data-gallery-close>×</button>
         </div>
-        <div class="gallery-image-wrap">
-          <img src="" alt="" data-gallery-image />
+        <div class="gallery-scroll" data-gallery-scroll tabindex="0" aria-label="项目作品连续页面">
+          <div class="gallery-pages" data-gallery-pages></div>
         </div>
         <div class="gallery-footer">
           <p data-gallery-caption></p>

@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { test } from 'node:test';
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
@@ -31,12 +31,20 @@ test('all local src and href assets exist and project-site paths stay relative',
 });
 
 test('portfolio galleries reference existing images', () => {
-  const imagePaths = [...script.matchAll(/'((?:assets\/work\/)[^']+)'/g)].map((match) => match[1]);
-  assert.ok(imagePaths.length >= 15);
-
-  for (const imagePath of imagePaths) {
-    assert.equal(existsSync(new URL(`../${imagePath}`, import.meta.url)), true, `${imagePath} should exist`);
+  const expectedCounts = { iqiyi: 6, muchun: 22, posters: 13, illustration: 15 };
+  for (const [gallery, expectedCount] of Object.entries(expectedCounts)) {
+    const galleryUrl = new URL(`../assets/gallery/${gallery}/`, import.meta.url);
+    assert.equal(existsSync(galleryUrl), true, `${gallery} gallery should exist`);
+    assert.equal(readdirSync(galleryUrl).filter((file) => file.endsWith('.webp')).length, expectedCount);
   }
+});
+
+test('project gallery supports continuous vertical scrolling', () => {
+  assert.match(html, /data-gallery-scroll/);
+  assert.match(html, /data-gallery-pages/);
+  assert.match(css, /\.gallery-scroll \{[^}]*overflow-y: auto/s);
+  assert.match(script, /createPages\('muchun', 4, 25/);
+  assert.match(script, /galleryScroll\?\.addEventListener\('scroll'/);
 });
 
 test('responsive and reduced-motion safeguards are present', () => {

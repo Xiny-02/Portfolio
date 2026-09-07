@@ -56,52 +56,68 @@ document.querySelector('[data-slide-next]')?.addEventListener('click', () => {
 });
 restartHeroTimer();
 
+const createPages = (folder, start, end, captions = {}) =>
+  Array.from({ length: end - start + 1 }, (_, offset) => {
+    const page = start + offset;
+    const pageLabel = String(page).padStart(2, '0');
+    return [
+      `assets/gallery/${folder}/page-${pageLabel}.webp`,
+      captions[page] || `作品集第 ${pageLabel} 页`,
+    ];
+  });
+
 const galleries = {
   iqiyi: {
     title: '爱奇艺少儿与动漫频道',
     type: '实习项目 · 多端运营视觉',
-    images: [
-      ['assets/work/iqiyi-channels.webp', '动漫频道多入口视觉与首页资源位'],
-      ['assets/work/iqiyi-kids.webp', '少儿频道内容焦点图与不同尺寸适配'],
-      ['assets/work/iqiyi-mobile.webp', '移动端内容入口视觉与素材分析'],
-      ['assets/work/iqiyi-ip.webp', 'IP 内容宣发与系列焦点图'],
-    ],
+    images: createPages('iqiyi', 57, 62, {
+      57: '动漫频道多入口视觉与首页资源位',
+      59: '少儿频道内容焦点图与不同尺寸适配',
+      60: '移动端内容入口视觉与素材分析',
+      61: 'IP 内容宣发与系列焦点图',
+      62: '视频剪辑与内容制作',
+    }),
   },
   muchun: {
     title: '牧淳羊乳品牌',
     type: '品牌设计 · 识别系统',
-    images: [
-      ['assets/work/muchun-cover.webp', '以牧羊形象为核心的品牌标志'],
-      ['assets/work/muchun-ip.webp', '品牌 IP 角色设定与形象延展'],
-      ['assets/work/muchun-poster.webp', '品牌海报与传播场景'],
-      ['assets/work/muchun-outdoor.webp', '品牌户外广告应用'],
-    ],
+    images: createPages('muchun', 4, 25, {
+      4: '以牧羊形象为核心的品牌标志',
+      5: '品牌背景与设计过程',
+      14: '品牌 IP 角色设定与形象延展',
+      16: '品牌海报与传播场景',
+      17: '品牌户外广告应用',
+      19: '产品包装系统',
+      25: '品牌名片与办公物料',
+    }),
   },
   posters: {
     title: '传统文化海报系列',
     type: '海报设计 · 文化表达',
-    images: [
-      ['assets/work/poster-miaoheng.webp', '妙趣横生：汉字与诗词的系列化构成'],
-      ['assets/work/poster-medicine.webp', '不要忘记：传统医药典籍主题海报'],
-      ['assets/work/poster-qingming.webp', '清明：以几何字形重组节气意象'],
-    ],
+    images: createPages('posters', 27, 39, {
+      27: '妙趣横生：汉字与诗词的系列化构成',
+      31: '不要忘记：传统医药典籍主题海报',
+      36: '清明：以几何字形重组节气意象',
+    }),
   },
   illustration: {
     title: '东方叙事视觉实验',
     type: '插画与字体 · 个人创作',
-    images: [
-      ['assets/work/illustration-concept.webp', '中国服饰系列插画：研究、草图与设定'],
-      ['assets/work/illustration-aobi.webp', '角色同人插画与展览场景'],
-      ['assets/work/typeface-set-a.webp', '中文字体造型与字义联想'],
-      ['assets/work/typeface-set-b.webp', '动态质感与故障风格字体实验'],
-    ],
+    images: createPages('illustration', 41, 55, {
+      41: '中国服饰系列插画：研究、草图与设定',
+      47: '角色同人插画创作',
+      51: '中文字体造型与字义联想',
+      53: '插画展览场景应用',
+      55: '动态质感与故障风格字体实验',
+    }),
   },
 };
 
 const dialog = document.querySelector('[data-gallery-dialog]');
 const galleryTitle = document.querySelector('[data-gallery-title]');
 const galleryType = document.querySelector('[data-gallery-type]');
-const galleryImage = document.querySelector('[data-gallery-image]');
+const galleryScroll = document.querySelector('[data-gallery-scroll]');
+const galleryPages = document.querySelector('[data-gallery-pages]');
 const galleryCaption = document.querySelector('[data-gallery-caption]');
 const galleryCounter = document.querySelector('[data-gallery-counter]');
 let activeGallery = null;
@@ -109,13 +125,41 @@ let galleryIndex = 0;
 
 const renderGallery = () => {
   if (!activeGallery) return;
-  const [src, caption] = activeGallery.images[galleryIndex];
   galleryTitle.textContent = activeGallery.title;
   galleryType.textContent = activeGallery.type;
-  galleryImage.src = src;
-  galleryImage.alt = caption;
-  galleryCaption.textContent = caption;
+  galleryPages.replaceChildren(
+    ...activeGallery.images.map(([src, caption], index) => {
+      const figure = document.createElement('figure');
+      const image = document.createElement('img');
+      const figcaption = document.createElement('figcaption');
+      const pageNumber = document.createElement('span');
+      const pageCaption = document.createElement('span');
+
+      figure.className = 'gallery-page';
+      figure.dataset.galleryPage = String(index);
+      image.src = src;
+      image.alt = caption;
+      image.loading = 'eager';
+      image.width = 1600;
+      image.height = 900;
+      pageNumber.textContent = `${String(index + 1).padStart(2, '0')} / ${String(activeGallery.images.length).padStart(2, '0')}`;
+      pageCaption.textContent = caption;
+      figcaption.append(pageNumber, pageCaption);
+      figure.append(image, figcaption);
+      return figure;
+    }),
+  );
   galleryCounter.textContent = `${String(galleryIndex + 1).padStart(2, '0')} / ${String(activeGallery.images.length).padStart(2, '0')}`;
+  galleryCaption.textContent = activeGallery.images[galleryIndex][1];
+};
+
+const showGalleryPage = (nextIndex, behavior = 'smooth') => {
+  if (!activeGallery) return;
+  galleryIndex = (nextIndex + activeGallery.images.length) % activeGallery.images.length;
+  const page = galleryPages.querySelector(`[data-gallery-page="${galleryIndex}"]`);
+  galleryCounter.textContent = `${String(galleryIndex + 1).padStart(2, '0')} / ${String(activeGallery.images.length).padStart(2, '0')}`;
+  galleryCaption.textContent = activeGallery.images[galleryIndex][1];
+  page.scrollIntoView({ behavior, block: 'start' });
 };
 
 const openGallery = (galleryName) => {
@@ -125,6 +169,10 @@ const openGallery = (galleryName) => {
   renderGallery();
   dialog.showModal();
   document.body.classList.add('is-dialog-open');
+  requestAnimationFrame(() => {
+    galleryScroll.scrollTop = 0;
+    galleryScroll.focus({ preventScroll: true });
+  });
 };
 
 const closeGallery = () => {
@@ -137,13 +185,27 @@ document.querySelectorAll('[data-gallery]').forEach((button) => {
 });
 document.querySelector('[data-gallery-close]')?.addEventListener('click', closeGallery);
 document.querySelector('[data-gallery-prev]')?.addEventListener('click', () => {
-  galleryIndex = (galleryIndex - 1 + activeGallery.images.length) % activeGallery.images.length;
-  renderGallery();
+  showGalleryPage(galleryIndex - 1);
 });
 document.querySelector('[data-gallery-next]')?.addEventListener('click', () => {
-  galleryIndex = (galleryIndex + 1) % activeGallery.images.length;
-  renderGallery();
+  showGalleryPage(galleryIndex + 1);
 });
+let galleryScrollFrame;
+galleryScroll?.addEventListener('scroll', () => {
+  window.cancelAnimationFrame(galleryScrollFrame);
+  galleryScrollFrame = window.requestAnimationFrame(() => {
+    if (!activeGallery) return;
+    const pages = [...galleryPages.querySelectorAll('[data-gallery-page]')];
+    const scrollRect = galleryScroll.getBoundingClientRect();
+    const readingLine = scrollRect.top + Math.min(80, galleryScroll.clientHeight * 0.15);
+    galleryIndex = pages.reduce(
+      (current, page, index) => (page.getBoundingClientRect().top <= readingLine ? index : current),
+      0,
+    );
+    galleryCounter.textContent = `${String(galleryIndex + 1).padStart(2, '0')} / ${String(activeGallery.images.length).padStart(2, '0')}`;
+    galleryCaption.textContent = activeGallery.images[galleryIndex][1];
+  });
+}, { passive: true });
 dialog?.addEventListener('click', (event) => {
   if (event.target === dialog) closeGallery();
 });
@@ -152,11 +214,9 @@ dialog?.addEventListener('close', () => document.body.classList.remove('is-dialo
 document.addEventListener('keydown', (event) => {
   if (!dialog?.open || !activeGallery) return;
   if (event.key === 'ArrowLeft') {
-    galleryIndex = (galleryIndex - 1 + activeGallery.images.length) % activeGallery.images.length;
-    renderGallery();
+    showGalleryPage(galleryIndex - 1);
   }
   if (event.key === 'ArrowRight') {
-    galleryIndex = (galleryIndex + 1) % activeGallery.images.length;
-    renderGallery();
+    showGalleryPage(galleryIndex + 1);
   }
 });
